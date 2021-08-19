@@ -3,6 +3,7 @@
 namespace Rutatiina\POS\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Scopes\TenantIdScope;
 
@@ -151,17 +152,19 @@ class POSOrder extends Model
         $grouped = [];
         $this->item_taxes->load('tax'); //the values of the tax are used by the display of the document on the from end
 
+        Log::info($this->item_taxes);
+
         foreach($this->item_taxes as $item_tax)
         {
             if (isset($grouped[$item_tax->tax_code]))
             {
-                $grouped['amount'] += $item_tax['amount'];
-                $grouped['inclusive'] += $item_tax['inclusive'];
-                $grouped['exclusive'] += $item_tax['exclusive'];
+                $grouped[$item_tax->tax_code]['amount'] += $item_tax['amount'];
+                $grouped[$item_tax->tax_code]['inclusive'] += $item_tax['inclusive'];
+                $grouped[$item_tax->tax_code]['exclusive'] += $item_tax['exclusive'];
             }
             else
             {
-                $grouped[$item_tax->tax_code] = $item_tax;
+                $grouped[$item_tax->tax_code] = $item_tax->toArray();
             }
         }
         return $grouped;
