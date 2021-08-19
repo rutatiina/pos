@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Rutatiina\FinancialAccounting\Traits\FinancialAccountingTrait;
 use Rutatiina\Contact\Traits\ContactTrait;
+use Milon\Barcode\Facades\DNS2DFacade;
+use Milon\Barcode\Facades\DNS1DFacade;
 
 use Rutatiina\POS\Models\POSOrder;
 use Rutatiina\POS\Services\POSOrderService;
@@ -94,6 +96,7 @@ class POSController extends Controller
             'number_string',
             'total_in_words',
         ]);
+        $txn->barcode_c39 = DNS1DFacade::getBarcodePNG(str_pad($txn->id, 10, "0", STR_PAD_LEFT), 'C39');
 
         return $txn->toArray();
     }
