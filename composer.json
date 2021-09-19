@@ -12,14 +12,7 @@
     "minimum-stability": "beta",
     "require": {
         "laravel/framework": "^8.0",
-        "rutatiina/services": "*",
-        "rutatiina/tenant": "*",
-        "rutatiina/financial-accounting": "*",
-        "rutatiina/tax": "*",
-        "rutatiina/contact": "*",
-        "rutatiina/item": "*",
-        "rutatiina/sales": "*",
-        "rutatiina/purchases": "*"
+        "rutatiina/financial-accounting": "*"
     },
     "autoload": {
         "psr-4": {
