@@ -5,7 +5,7 @@ namespace Rutatiina\POS\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Traits\LogsActivity;
-use App\Scopes\TenantIdScope;
+use Rutatiina\Tenant\Scopes\TenantIdScope;
 
 class POSOrder extends Model
 {
