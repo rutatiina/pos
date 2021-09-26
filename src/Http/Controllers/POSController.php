@@ -32,8 +32,8 @@ class POSController extends Controller
         //load the vue version of the app
         if (!FacadesRequest::wantsJson())
         {
-            //return view('l-limitless-bs4.layout_2-ltr-default.appVue');
-            return view('l-limitless-bs4.layout_2-ltr-default.vue-pos');
+            //return view('ui.limitless::layout_2-ltr-default.appVue');
+            return view('ui.limitless::layout_2-ltr-default.vue-pos');
         }
 
         $tenant = Auth::user()->tenant;
@@ -86,7 +86,7 @@ class POSController extends Controller
     {
         if (!FacadesRequest::wantsJson())
         {
-            return view('l-limitless-bs4.layout_2-ltr-default.appVue');
+            return view('ui.limitless::layout_2-ltr-default.appVue');
         }
 
         $txn = POSOrder::findOrFail($id);
@@ -123,7 +123,7 @@ class POSController extends Controller
         //load the vue version of the app
         if (!FacadesRequest::wantsJson())
         {
-            return view('l-limitless-bs4.layout_2-ltr-default.appVue');
+            return view('ui.limitless::layout_2-ltr-default.appVue');
         }
 
         $query = POSOrder::query();
