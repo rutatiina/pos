@@ -86,6 +86,8 @@ class POSOrderValidateService
         $data['cash_tendered'] = $requestInstance->input('cash_tendered', null);
         $data['cash_change'] = $requestInstance->input('cash_change', null);
         $data['balances_where_updated'] = 0;
+        $data['total'] = $requestInstance->input('total', null);;
+        $data['taxable_amount'] = $requestInstance->input('taxable_amount', null);;
 
 
         //set the transaction total to zero
@@ -126,8 +128,8 @@ class POSOrderValidateService
             ];
         }
 
-        $data['taxable_amount'] = $taxableAmount;
-        $data['total'] = $txnTotal;
+        $data['taxable_amount'] = (is_null($data['taxable_amount'])) ? $taxableAmount : $data['taxable_amount'];
+        $data['total'] = (is_null($data['total'])) ? $txnTotal : $data['total'];
 
 
         //DR ledger

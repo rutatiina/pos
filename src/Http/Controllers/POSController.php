@@ -66,6 +66,8 @@ class POSController extends Controller
 
     public function store(Request $request)
     {
+        //return $request;
+
         $storeService = POSOrderService::store($request);
 
         if ($storeService == false)
