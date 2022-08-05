@@ -2,16 +2,15 @@
 
 namespace Rutatiina\POS\Services;
 
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Rutatiina\POS\Models\POSOrder;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Rutatiina\POS\Models\POSOrderSetting;
+use Rutatiina\GoodsDelivered\Services\GoodsDeliveredService;
 use Rutatiina\FinancialAccounting\Services\AccountBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\ContactBalanceUpdateService;
-use Rutatiina\POS\Models\POSOrderSetting;
-use Rutatiina\RetainerInvoice\Models\RetainerInvoiceSetting;
-use Rutatiina\Tax\Models\Tax;
 
 class POSOrderService
 {
@@ -84,6 +83,27 @@ class POSOrderService
             //Update the contact balances
             //ContactBalanceUpdateService::doubleEntry($data);
 
+            //if the Goods delivered package is installed, update the inventory for items with inventory tracking
+            if ($data['has_inventory_trackable_items'] && class_exists('Rutatiina\GoodsDelivered\Services\GoodsDeliveredService') )
+            {
+                $requestInstance->merge([
+                    'document_name' => 'Cash sale',
+                    'itemable_id' => $data['id'],
+                    'itemable_key' => 'pos_order_id',
+                    'itemable_type' => 'Rutatiina\POS\Models\POSOrderItem',
+                ]);
+
+                $storeGoodsDeliveredNote = GoodsDeliveredService::store($requestInstance);
+                // var_dump(GoodsDeliveredService::$errors); exit;
+
+                if ($storeGoodsDeliveredNote == false)
+                {
+                    DB::connection('tenant')->rollBack();
+                    self::$errors = GoodsDeliveredService::$errors;
+                    return false;
+                }
+            }
+
             DB::connection('tenant')->commit();
 
             return $Txn;
@@ -103,6 +123,7 @@ class POSOrderService
                 self::$errors[] = 'File: ' . $e->getFile();
                 self::$errors[] = 'Line: ' . $e->getLine();
                 self::$errors[] = 'Message: ' . $e->getMessage();
+                self::$errors[] = 'Mysql error number: ' . $e->errorInfo[1];
             }
             else
             {

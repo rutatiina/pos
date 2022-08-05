@@ -2,8 +2,9 @@
 
 namespace Rutatiina\POS\Services;
 
-use Illuminate\Support\Facades\Validator;
+use Rutatiina\Item\Models\Item;
 use Rutatiina\Contact\Models\Contact;
+use Illuminate\Support\Facades\Validator;
 use Rutatiina\POS\Models\POSOrderSetting;
 
 class POSOrderValidateService
@@ -87,7 +88,9 @@ class POSOrderValidateService
         $data['cash_change'] = $requestInstance->input('cash_change', null);
         $data['balances_where_updated'] = 0;
         $data['total'] = $requestInstance->input('total', null);;
-        $data['taxable_amount'] = $requestInstance->input('taxable_amount', null);;
+        $data['taxable_amount'] = $requestInstance->input('taxable_amount', null);
+
+        $data['has_inventory_trackable_items'] = false;
 
 
         //set the transaction total to zero
@@ -111,6 +114,8 @@ class POSOrderValidateService
                 $itemTaxableAmount  -= $itemTax['inclusive']; //calculate the item taxable amount more by removing the inclusive amount
             }
 
+            $itemModel = Item::find($item['item_id']);
+
             $data['items'][] = [
                 'tenant_id' => $data['tenant_id'],
                 'created_by' => $data['created_by'],
@@ -126,6 +131,8 @@ class POSOrderValidateService
                 'expiry' => $requestInstance->input('items.'.$key.'.expiry', null),
                 'taxes' => $itemTaxes,
             ];
+
+            if ($itemModel->inventory_tracking) $data['has_inventory_trackable_items'] = true;
         }
 
         $data['taxable_amount'] = (is_null($data['taxable_amount'])) ? $taxableAmount : $data['taxable_amount'];
