@@ -135,6 +135,8 @@ class POSOrderValidateService
             if ($itemModel->inventory_tracking) $data['has_inventory_trackable_items'] = true;
         }
 
+        //var_dump($data['has_inventory_trackable_items']); exit;
+
         $data['taxable_amount'] = (is_null($data['taxable_amount'])) ? $taxableAmount : $data['taxable_amount'];
         $data['total'] = (is_null($data['total'])) ? $txnTotal : $data['total'];
 
