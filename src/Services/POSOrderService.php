@@ -123,7 +123,8 @@ class POSOrderService
                 self::$errors[] = 'File: ' . $e->getFile();
                 self::$errors[] = 'Line: ' . $e->getLine();
                 self::$errors[] = 'Message: ' . $e->getMessage();
-                self::$errors[] = 'Mysql error number: ' . $e->errorInfo[1];
+                
+                //if (isset($e->errorInfo[1])) self::$errors[] = 'Mysql error number: ' . $e->errorInfo[1];
             }
             else
             {

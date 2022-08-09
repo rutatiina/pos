@@ -66,6 +66,7 @@ class POSController extends Controller
 
     public function store(Request $request)
     {
+        sleep(15);
         //return $request;
 
         $storeService = POSOrderService::store($request);
