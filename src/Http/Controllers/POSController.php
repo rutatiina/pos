@@ -21,10 +21,11 @@ class POSController extends Controller
 
     public function __construct()
     {
-        //$this->middleware('permission:recurring-bills.view');
-        //$this->middleware('permission:recurring-bills.create', ['only' => ['create','store']]);
-        //$this->middleware('permission:recurring-bills.update', ['only' => ['edit','update']]);
-        //$this->middleware('permission:recurring-bills.delete', ['only' => ['destroy']]);
+        $this->middleware('permission:pos.view');
+        $this->middleware('permission:pos.order.view', ['only' => ['orders']]);
+        $this->middleware('permission:pos.order.create', ['only' => ['create','store']]);
+        $this->middleware('permission:pos.order.update', ['only' => ['edit','update']]);
+        $this->middleware('permission:pos.order.delete', ['only' => ['destroy']]);
     }
 
     public function index(Request $request)
@@ -66,7 +67,6 @@ class POSController extends Controller
 
     public function store(Request $request)
     {
-        sleep(15);
         //return $request;
 
         $storeService = POSOrderService::store($request);
