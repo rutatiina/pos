@@ -2,13 +2,15 @@
 
 namespace Rutatiina\POS\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Model;
 use Rutatiina\Tenant\Scopes\TenantIdScope;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class POSOrder extends Model
 {
+    use SoftDeletes;
     use LogsActivity;
 
     protected static $logName = 'Txn';

@@ -146,4 +146,30 @@ class POSController extends Controller
         ];
     }
 
+    public function routes()
+    {
+        return [
+            'delete' => route('pos.delete'),
+            // 'cancel' => route('pos.cancel'),
+        ];
+    }
+
+    public function delete(Request $request)
+    {
+        if (POSOrderService::destroyMany($request->ids))
+        {
+            return [
+                'status' => true,
+                'messages' => [count($request->ids) . ' Goods received note(s) deleted.'],
+            ];
+        }
+        else
+        {
+            return [
+                'status' => false,
+                'messages' => POSOrderService::$errors
+            ];
+        }
+    }
+
 }
