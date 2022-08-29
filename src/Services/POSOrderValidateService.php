@@ -116,6 +116,14 @@ class POSOrderValidateService
 
             $itemModel = Item::find($item['item_id']);
 
+            if (!$itemModel)
+            {
+                self::$errors[] = isset($item['name']) ? 'Item ('.$item['name'].') unknown / not found' : 'Item #'.($key+1).' unknown / not found';
+                return false;
+            }
+
+            $units = optional($itemModel)->units * $item['quantity'];
+
             $data['items'][] = [
                 'tenant_id' => $data['tenant_id'],
                 'created_by' => $data['created_by'],
@@ -126,7 +134,7 @@ class POSOrderValidateService
                 'rate' => $item['rate'],
                 'total' => $item['total'],
                 'taxable_amount' => $itemTaxableAmount,
-                'units' => $requestInstance->input('items.'.$key.'.units', null),
+                'units' => $requestInstance->input('items.'.$key.'.units', $units),
                 'batch' => $requestInstance->input('items.'.$key.'.batch', null),
                 'expiry' => $requestInstance->input('items.'.$key.'.expiry', null),
                 'taxes' => $itemTaxes,
