@@ -160,7 +160,7 @@ class POSController extends Controller
         {
             return [
                 'status' => true,
-                'messages' => [count($request->ids) . ' Goods received note(s) deleted.'],
+                'messages' => [count($request->ids) . ' Order(s) deleted.'],
             ];
         }
         else

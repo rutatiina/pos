@@ -81,28 +81,13 @@ class POSOrderService
             //Update the account balances
             AccountBalanceUpdateService::doubleEntry($data);
 
-            //Update the contact balances
-            //ContactBalanceUpdateService::doubleEntry($data);
-
-            //if the Goods delivered package is installed, update the inventory for items with inventory tracking
-            if ($data['has_inventory_trackable_items'] && class_exists('Rutatiina\GoodsDelivered\Services\GoodsDeliveredService') )
+            if (GoodsDeliveredInventoryService::update($data))
             {
-                $requestInstance->merge([
-                    'document_name' => 'Cash sale',
-                    'itemable_id' => $data['id'],
-                    'itemable_key' => 'pos_order_id',
-                    'itemable_type' => 'Rutatiina\POS\Models\POSOrderItem',
-                ]);
-
-                $storeGoodsDeliveredNote = GoodsDeliveredService::store($requestInstance);
-                // var_dump(GoodsDeliveredService::$errors); exit;
-
-                if ($storeGoodsDeliveredNote == false)
-                {
-                    DB::connection('tenant')->rollBack();
-                    self::$errors = GoodsDeliveredService::$errors;
-                    return false;
-                }
+                //do nothing 
+            }
+            else
+            {
+                DB::connection('tenant')->rollBack();
             }
 
             DB::connection('tenant')->commit();

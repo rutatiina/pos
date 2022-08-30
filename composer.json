@@ -12,7 +12,8 @@
     "minimum-stability": "dev",
     "require": {
         "laravel/framework": "^8.0",
-        "rutatiina/financial-accounting": "dev-main"
+        "rutatiina/financial-accounting": "dev-main",
+        "rutatiina/goods-delivered": "dev-main"
     },
     "autoload": {
         "psr-4": {
