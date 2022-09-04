@@ -69,9 +69,9 @@ class POSController extends Controller
     {
         //return $request;
 
-        $storeService = POSOrderService::store($request);
+        $order = POSOrderService::store($request);
 
-        if ($storeService == false)
+        if ($order == false)
         {
             return [
                 'status' => false,
@@ -82,6 +82,7 @@ class POSController extends Controller
         return [
             'status' => true,
             'messages' => ['Order completed'],
+            'order' => POSOrderService::find($order->id)
         ];
     }
 
@@ -92,15 +93,7 @@ class POSController extends Controller
             return view('ui.limitless::layout_2-ltr-default.appVue');
         }
 
-        $txn = POSOrder::findOrFail($id);
-        $txn->load('items.taxes', 'ledgers');
-        $txn->setAppends([
-            'taxes',
-            'number_string',
-            'total_in_words',
-        ]);
-        $txn->barcode_c39 = DNS1DFacade::getBarcodePNG(str_pad($txn->id, 10, "0", STR_PAD_LEFT), 'C39');
-
+        $txn = POSOrderService::find($id);
         return $txn->toArray();
     }
 

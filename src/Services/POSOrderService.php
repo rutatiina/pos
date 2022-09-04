@@ -12,6 +12,8 @@ use Rutatiina\GoodsDelivered\Services\GoodsDeliveredService;
 use Rutatiina\GoodsDelivered\Services\GoodsDeliveredInventoryService;
 use Rutatiina\FinancialAccounting\Services\AccountBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\ContactBalanceUpdateService;
+use Milon\Barcode\Facades\DNS2DFacade;
+use Milon\Barcode\Facades\DNS1DFacade;
 
 class POSOrderService
 {
@@ -121,6 +123,19 @@ class POSOrderService
         }
         //*/
 
+    }
+
+    public static function find($id)
+    {
+        $txn = POSOrder::findOrFail($id);
+        $txn->load('items.taxes', 'ledgers');
+        $txn->setAppends([
+            'taxes',
+            'number_string',
+            'total_in_words',
+        ]);
+        $txn->barcode_c39 = DNS1DFacade::getBarcodePNG(str_pad($txn->id, 10, "0", STR_PAD_LEFT), 'C39');
+        return $txn;
     }
 
 
