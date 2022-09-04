@@ -81,7 +81,13 @@ class POSOrderService
             POSOrderLedgerService::store($data);
 
             //Update the account balances
-            AccountBalanceUpdateService::doubleEntry($data);
+            //update the status of the txn
+            if (AccountBalanceUpdateService::doubleEntry($data))
+            {
+                $Txn->status = $data['status'];
+                $Txn->balances_where_updated = 1;
+                $Txn->save();
+            }
 
             if (GoodsDeliveredInventoryService::update($data))
             {
@@ -147,12 +153,15 @@ class POSOrderService
 
         try
         {
-            $Txn = POSOrder::with('items')->findOrFail($id);
+            $Txn = POSOrder::with(['items', 'ledgers'])->findOrFail($id);
+            $txnArray = $Txn->toArray();
 
-            GoodsDeliveredInventoryService::reverse($Txn->toArray());
+            GoodsDeliveredInventoryService::reverse($txnArray);
 
-            //Delete affected relations
-            $Txn->items()->delete();
+            //Update the account balances
+            AccountBalanceUpdateService::doubleEntry($txnArray, true);
+
+            //Delete the model
             $Txn->delete();
 
             DB::connection('tenant')->commit();

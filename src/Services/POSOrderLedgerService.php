@@ -17,7 +17,7 @@ class POSOrderLedgerService
     {
         foreach ($data['ledgers'] as &$ledger)
         {
-            $ledger['retainer_invoice_id'] = $data['id'];
+            $ledger['pos_order_id'] = $data['id'];
             POSOrderLedger::create($ledger);
         }
         unset($ledger);
