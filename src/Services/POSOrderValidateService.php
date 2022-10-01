@@ -152,7 +152,7 @@ class POSOrderValidateService
 
         //DR ledger
         $data['ledgers'][] = [
-            'financial_account_code' => $settings->financial_account_to_debit->code,
+            'financial_account_code' => $data['debit_financial_account_code'],
             'effect' => 'debit',
             'total' => $data['total'],
             'contact_id' => $data['contact_id']
@@ -160,7 +160,7 @@ class POSOrderValidateService
 
         //CR ledger
         $data['ledgers'][] = [
-            'financial_account_code' => $settings->financial_account_to_credit->code,
+            'financial_account_code' => $data['credit_financial_account_code'],
             'effect' => 'credit',
             'total' => $data['total'],
             'contact_id' => $data['contact_id']
