@@ -144,8 +144,6 @@ class POSOrderService
         return $txn;
     }
 
-
-
     public static function destroy($id)
     {
         //start database transaction
@@ -193,11 +191,68 @@ class POSOrderService
         }
     }
 
+    public static function cancel($id)
+    {
+        //start database transaction
+        DB::connection('tenant')->beginTransaction();
+
+        try
+        {
+            $Txn = POSOrder::with(['items', 'ledgers'])->findOrFail($id);
+            $txnArray = $Txn->toArray();
+
+            GoodsDeliveredInventoryService::reverse($txnArray);
+
+            //Update the account balances
+            AccountBalanceUpdateService::doubleEntry($txnArray, true);
+
+            //Delete the model
+            $Txn->canceled = 1;
+            $Txn->save();
+
+            DB::connection('tenant')->commit();
+
+            return true;
+
+        }
+        catch (\Throwable $e)
+        {
+            DB::connection('tenant')->rollBack();
+
+            Log::critical('Fatal Internal Error: Failed to cancel POS order from database');
+            Log::critical($e);
+
+            //print_r($e); exit;
+            if (App::environment('local'))
+            {
+                self::$errors[] = 'Error: Failed to cancel POS order from database.';
+                self::$errors[] = 'File: ' . $e->getFile();
+                self::$errors[] = 'Line: ' . $e->getLine();
+                self::$errors[] = 'Message: ' . $e->getMessage();
+            }
+            else
+            {
+                self::$errors[] = 'Fatal Internal Error: Failed to cancel POS order from database. Please contact Admin';
+            }
+
+            return false;
+        }
+    }
+
     public static function destroyMany($ids)
     {
         foreach($ids as $id)
         {
             if(!self::destroy($id)) return false;
+        }
+        return true;
+    }
+
+    public static function cancelMany($ids)
+    {
+        foreach($ids as $id)
+        {
+            if(!self::cancel($id)) return false;
         }
         return true;
     }

@@ -8,6 +8,7 @@ Route::group(['middleware' => ['web', 'auth', 'tenant', 'service.accounting']], 
         Route::get('orders', 'Rutatiina\POS\Http\Controllers\POSController@orders');
         Route::get('orders/{id}', 'Rutatiina\POS\Http\Controllers\POSController@show');
         Route::delete('delete', 'Rutatiina\POS\Http\Controllers\POSController@delete')->name('pos.delete');
+        Route::patch('cancel', 'Rutatiina\POS\Http\Controllers\POSController@cancel')->name('pos.cancel');
     });
 
     Route::resource('pos', 'Rutatiina\POS\Http\Controllers\POSController');
