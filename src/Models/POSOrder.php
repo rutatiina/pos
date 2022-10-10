@@ -54,8 +54,27 @@ class POSOrder extends Model
         static::addGlobalScope(new TenantIdScope);
 
         self::deleting(function($txn) { // before delete() method call this
-             $txn->items()->delete();
-             $txn->ledgers()->delete();
+             $txn->items()->each(function($row) {
+                $row->delete();
+             });
+             $txn->ledgers()->each(function($row) {
+                $row->delete();
+             });
+             $txn->item_taxes()->each(function($row) {
+                $row->delete();
+             });
+        });
+
+        self::restoring(function($txn) {
+             $txn->items()->withTrashed()->each(function($row) {
+                $row->restore();
+             });
+             $txn->ledgers()->withTrashed()->each(function($row) {
+                $row->restore();
+             });
+             $txn->item_taxes()->withTrashed()->each(function($row) {
+                $row->restore();
+             });
         });
 
     }
