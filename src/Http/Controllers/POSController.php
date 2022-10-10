@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Milon\Barcode\Facades\DNS1DFacade;
 use Milon\Barcode\Facades\DNS2DFacade;
+use Spatie\Activitylog\Models\Activity;
 use Rutatiina\Contact\Traits\ContactTrait;
 use Rutatiina\POS\Services\POSOrderService;
 use Illuminate\Support\Facades\Request as FacadesRequest;
@@ -30,35 +31,6 @@ class POSController extends Controller
 
     public function index(Request $request)
     {
-        //*
-        $ids = [];
-        Log::info("* Find deleted transactions and mark them as canceled.");
-        $tables = [
-
-            //pos
-            'rg_pos_orders' => POSOrder::class,
-			
-		];
-
-        foreach ($tables as $t => $model) 
-        {
-            $count = $model::withTrashed()->whereNotNull('deleted_at')->count();
-            Log::info("   - Table: ".$t." has ".$count." deleted records.");
-
-            $model::withTrashed()->whereNotNull('deleted_at')->update(['canceled' => 1]);
-            
-            // $model::withTrashed()->whereNotNull('deleted_at')->restore();
-            $model::withTrashed()->whereNotNull('deleted_at')->chunk(500, function ($records) {
-                foreach ($records as $record) {
-                    $record->restore();
-                    Log::info("   - Order: ".$record->id." restored.");
-                }
-            });
-        }
-        Log::info("  * Complete.");
-        return 'Restoration of soft deletes complete';
-        //*/
-
         //load the vue version of the app
         if (!FacadesRequest::wantsJson())
         {

@@ -36,6 +36,12 @@ class POSOrderItem extends Model
         parent::boot();
 
         static::addGlobalScope(new TenantIdScope);
+
+        self::deleting(function($txn) {
+             $txn->taxes()->each(function($row) {
+                $row->delete();
+             });
+        });
     }
 
     public function pos_order()
