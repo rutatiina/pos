@@ -1,0 +1,30 @@
+{
+    "name": "rutatiina/pos",
+    "description": "Laravel Point of sales package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gilbert Rutatiina",
+            "email": "rutatiina@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "laravel/framework": "^8.0",
+        "rutatiina/financial-accounting": "dev-main",
+        "rutatiina/goods-delivered": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rutatiina\\POS\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Rutatiina\\POS\\POSServiceProvider"
+            ]
+        }
+    }
+}
