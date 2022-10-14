@@ -32,6 +32,7 @@ class POSOrderValidateService
             'contact_id' => 'numeric|nullable',
             'date' => 'required|date',
             'currency' => 'required',
+            'discount' => 'numeric|nullable',
 
             'items' => 'required|array',
             'items.*.name' => 'required_without:type_id',
@@ -88,6 +89,7 @@ class POSOrderValidateService
         $data['cash_change'] = $requestInstance->input('cash_change', null);
         $data['balances_where_updated'] = 0;
         $data['total'] = $requestInstance->input('total', null);;
+        $data['discount'] = $requestInstance->input('discount', 0);;
         $data['taxable_amount'] = $requestInstance->input('taxable_amount', null);
 
         $data['has_inventory_trackable_items'] = false;

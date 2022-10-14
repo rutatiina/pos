@@ -60,6 +60,7 @@ class POSOrderService
             $Txn->currency = $data['currency'];
             $Txn->taxable_amount = $data['taxable_amount'];
             $Txn->total = $data['total'];
+            $Txn->discount = $data['discount'];
             $Txn->cash_tendered = $data['cash_tendered'];
             $Txn->cash_change = $data['cash_change'];
             $Txn->branch_id = $data['branch_id'];
