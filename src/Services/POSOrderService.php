@@ -140,8 +140,11 @@ class POSOrderService
             'taxes',
             'number_string',
             'total_in_words',
+            'print',
         ]);
         $txn->barcode_c39 = DNS1DFacade::getBarcodePNG(str_pad($txn->id, 10, "0", STR_PAD_LEFT), 'C39');
+
+
         return $txn;
     }
 

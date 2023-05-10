@@ -44,6 +44,7 @@ class POSOrder extends Model
     protected $appends = [
         'number_string',
         'total_in_words',
+        'print',
     ];
 
     /**
@@ -213,6 +214,11 @@ class POSOrder extends Model
             }
         }
         return $grouped;
+    }
+
+    public function getPrintAttribute()
+    {
+        return optional(POSOrderSetting::first())->print_receipt;
     }
 
 }

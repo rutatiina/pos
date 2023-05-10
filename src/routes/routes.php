@@ -12,6 +12,7 @@ Route::group(['middleware' => ['web', 'auth', 'tenant', 'service.accounting']], 
         Route::patch('cancel', 'Rutatiina\POS\Http\Controllers\POSController@cancel')->name('pos.cancel');
     });
 
+    Route::resource('pos/settings', 'Rutatiina\POS\Http\Controllers\POSSettingsController');
     Route::resource('pos', 'Rutatiina\POS\Http\Controllers\POSController');
 
 });
