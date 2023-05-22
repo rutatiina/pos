@@ -7,13 +7,14 @@ use Rutatiina\POS\Models\POSOrder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Milon\Barcode\Facades\DNS1DFacade;
+use Milon\Barcode\Facades\DNS2DFacade;
 use Rutatiina\POS\Models\POSOrderSetting;
 use Rutatiina\GoodsDelivered\Services\GoodsDeliveredService;
+use Rutatiina\FinancialAccounting\Services\ItemBalanceUpdateService;
 use Rutatiina\GoodsDelivered\Services\GoodsDeliveredInventoryService;
 use Rutatiina\FinancialAccounting\Services\AccountBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\ContactBalanceUpdateService;
-use Milon\Barcode\Facades\DNS2DFacade;
-use Milon\Barcode\Facades\DNS1DFacade;
 
 class POSOrderService
 {
@@ -90,6 +91,9 @@ class POSOrderService
                 $Txn->save();
             }
 
+            //Update the item balances
+            ItemBalanceUpdateService::entry($data);
+
             if (GoodsDeliveredInventoryService::update($data))
             {
                 //do nothing 
@@ -163,6 +167,9 @@ class POSOrderService
             //Update the account balances
             AccountBalanceUpdateService::doubleEntry($txnArray, true);
 
+            //Update the item balances
+            ItemBalanceUpdateService::entry($txnArray, true);
+
             //Delete the model
             $Txn->delete();
 
@@ -209,6 +216,9 @@ class POSOrderService
 
             //Update the account balances
             AccountBalanceUpdateService::doubleEntry($txnArray, true);
+
+            //Update the item balances
+            ItemBalanceUpdateService::entry($txnArray, true);
 
             //Delete the model
             $Txn->canceled = 1;
