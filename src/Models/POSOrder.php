@@ -178,9 +178,43 @@ class POSOrder extends Model
         return $this->hasMany('Rutatiina\POS\Models\POSOrderItem', 'pos_order_id')->orderBy('id', 'asc');
     }
 
-    public function ledgers()
+    public function getLedgersAttribute($txn = null)
     {
-        return $this->hasMany('Rutatiina\POS\Models\POSOrderLedger', 'pos_order_id')->orderBy('id', 'asc');
+        // if (!$txn) $this->items;
+
+        $txn = $txn ?? $this;
+
+        $txn = (is_object($txn)) ? $txn : collect($txn);
+        
+        $ledgers = [];
+
+        //DR ledger
+        $ledgers['ledgers'][] = [
+            'financial_account_code' => $txn['debit_financial_account_code'],
+            'effect' => 'debit',
+            'total' => $txn['total'],
+            'contact_id' => $txn['contact_id']
+        ];
+
+        //CR ledger
+        $ledgers['ledgers'][] = [
+            'financial_account_code' => $txn['credit_financial_account_code'],
+            'effect' => 'credit',
+            'total' => $txn['total'],
+            'contact_id' => $txn['contact_id']
+        ];
+
+        foreach ($ledgers as &$ledger)
+        {
+            $ledger['tenant_id'] = $txn->tenant_id;
+            $ledger['date'] = $txn->date;
+            $ledger['base_currency'] = $txn->base_currency;
+            $ledger['quote_currency'] = $txn->quote_currency;
+            $ledger['exchange_rate'] = $txn->exchange_rate;
+        }
+        unset($ledger);
+
+        return collect($ledgers);
     }
 
     public function contact()

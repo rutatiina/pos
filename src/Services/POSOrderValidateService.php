@@ -124,12 +124,16 @@ class POSOrderValidateService
                 return false;
             }
 
+            //use item selling_financial_account_code if available and default if not
+            $financialAccountToCredit = (optional($itemModel)->selling_financial_account_code) ? $itemModel->selling_financial_account_code : $settings->financial_account_to_credit->code;
+
             $units = optional($itemModel)->units * $item['quantity'];
 
             $data['items'][] = [
                 'tenant_id' => $data['tenant_id'],
                 'created_by' => $data['created_by'],
                 'item_id' => optional($itemModel)->id, //$item['item_id'], use internal ID to verify data so that from here one the item_id value is LEGIT
+                'credit_financial_account_code' => $financialAccountToCredit,
                 'name' => $item['name'],
                 'description' => $item['description'],
                 'quantity' => $item['quantity'],
@@ -151,36 +155,7 @@ class POSOrderValidateService
         $data['taxable_amount'] = (is_null($data['taxable_amount'])) ? $taxableAmount : $data['taxable_amount'];
         $data['total'] = (is_null($data['total'])) ? $txnTotal : $data['total'];
 
-
-        //DR ledger
-        $data['ledgers'][] = [
-            'financial_account_code' => $data['debit_financial_account_code'],
-            'effect' => 'debit',
-            'total' => $data['total'],
-            'contact_id' => $data['contact_id']
-        ];
-
-        //CR ledger
-        $data['ledgers'][] = [
-            'financial_account_code' => $data['credit_financial_account_code'],
-            'effect' => 'credit',
-            'total' => $data['total'],
-            'contact_id' => $data['contact_id']
-        ];
-
         //print_r($data); exit;
-
-        //Now add the default values to items and ledgers
-
-        foreach ($data['ledgers'] as &$ledger)
-        {
-            $ledger['tenant_id'] = $data['tenant_id'];
-            $ledger['date'] = date('Y-m-d', strtotime($data['date']));
-            $ledger['base_currency'] = $data['currency'];
-            $ledger['quote_currency'] = $data['currency'];
-            $ledger['exchange_rate'] = 1;
-        }
-        unset($ledger);
 
         //Return the array of txns
         //print_r($data); exit;

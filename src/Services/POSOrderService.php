@@ -79,29 +79,10 @@ class POSOrderService
             //Save the items >> $data['items']
             POSOrderItemService::store($data);
 
-            //Save the ledgers >> $data['ledgers']; and update the balances
-            POSOrderLedgerService::store($data);
+            $Txn = $Txn->refresh();
 
-            //Update the account balances
-            //update the status of the txn
-            if (AccountBalanceUpdateService::doubleEntry($data))
-            {
-                $Txn->status = $data['status'];
-                $Txn->balances_where_updated = 1;
-                $Txn->save();
-            }
-
-            //Update the item balances
-            ItemBalanceUpdateService::entry($data);
-
-            if (GoodsDeliveredInventoryService::update($data))
-            {
-                //do nothing 
-            }
-            else
-            {
-                DB::connection('tenant')->rollBack();
-            }
+            //Update the balances
+            POSOrderApprovalService::run($Txn);
 
             DB::connection('tenant')->commit();
 
@@ -139,12 +120,13 @@ class POSOrderService
     public static function find($id)
     {
         $txn = POSOrder::findOrFail($id);
-        $txn->load('items.taxes', 'ledgers');
+        $txn->load('items.taxes');
         $txn->setAppends([
             'taxes',
             'number_string',
             'total_in_words',
             'print',
+            'ledgers'
         ]);
         $txn->barcode_c39 = DNS1DFacade::getBarcodePNG(str_pad($txn->id, 10, "0", STR_PAD_LEFT), 'C39');
 
@@ -159,7 +141,7 @@ class POSOrderService
 
         try
         {
-            $Txn = POSOrder::with(['items', 'ledgers'])->findOrFail($id);
+            $Txn = POSOrder::with(['items'])->findOrFail($id);
             $txnArray = $Txn->toArray();
 
             GoodsDeliveredInventoryService::reverse($txnArray);
@@ -209,7 +191,7 @@ class POSOrderService
 
         try
         {
-            $Txn = POSOrder::with(['items', 'ledgers'])->findOrFail($id);
+            $Txn = POSOrder::with(['items'])->findOrFail($id);
             $txnArray = $Txn->toArray();
 
             GoodsDeliveredInventoryService::reverse($txnArray);
