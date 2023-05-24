@@ -208,9 +208,7 @@ class POSOrder extends Model
         {
             $ledger['tenant_id'] = $txn->tenant_id;
             $ledger['date'] = $txn->date;
-            $ledger['base_currency'] = $txn->base_currency;
-            $ledger['quote_currency'] = $txn->quote_currency;
-            $ledger['exchange_rate'] = $txn->exchange_rate;
+            $ledger['currency'] = $txn->currency;
         }
         unset($ledger);
 

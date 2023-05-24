@@ -79,7 +79,7 @@ class POSOrderService
             //Save the items >> $data['items']
             POSOrderItemService::store($data);
 
-            $Txn = $Txn->refresh();
+            $Txn->refresh();
 
             //Update the balances
             POSOrderApprovalService::run($Txn);
